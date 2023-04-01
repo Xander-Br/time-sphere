@@ -2,11 +2,12 @@ import os
 import time
 from datetime import datetime
 
-
 import bcrypt
+
 from fastapi import FastAPI, Query, File, UploadFile, Form, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+
 from pymongo import MongoClient
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
@@ -19,7 +20,7 @@ db = client["db"]
 capsuleCollection = db["capsule"]
 capsuleCollection.create_index([("location", "2dsphere")])
 
-userCollection = db["capsule"]
+userCollection = db["user"]
 
 STATIC_DIR = "static"
 os.makedirs(STATIC_DIR, exist_ok=True)
@@ -27,10 +28,6 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 
 class User(BaseModel):
     username: str
-    password: str
-
-
-
 
 class Capsule(BaseModel):
     username: str
@@ -41,16 +38,10 @@ class Capsule(BaseModel):
     data_text: str
     friends: Optional[list]
 
-
-
-def authenticate_user(username: str, password: str):
+def authenticate_user(username: str):
     user = userCollection.find_one({"username": username})
-    try:
-        if not user:
-            return None
-        if not password != user["password"]:
-            return None
-    except:
+
+    if not user:
         return None
     return user
 
@@ -61,6 +52,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
 
 
 async def save_image(file: UploadFile):
@@ -139,10 +133,10 @@ async def get_documents_near_location(longitude: float = Query(..., description=
 
 
 @app.post("/login")
-async def login_user(username: str = Form(...), password: str = Form(...)):
-    user = authenticate_user(username, password)
+async def login_user(username: str = Form(...)):
+    user = authenticate_user(username)
     if not user:
-        user_data = {"username": username, "password": password}
+        user_data = {"username": username}
 
         result = userCollection.insert_one(user_data)
         if result:
@@ -151,3 +145,5 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
 
         user = {"_id": str(user["_id"]), "username": user["username"]}
         return {"status": "success", "message": "User authenticated", "user": user}
+    user = {"_id": str(user["_id"]), "username": user["username"]}
+    return {"status": "success", "message": "User authenticated", "user": user}
