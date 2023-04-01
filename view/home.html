@@ -52,7 +52,7 @@
 <div id='map' style='width: 100vw; height: 100vh;'></div>
 
 
-<nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark">
+<nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" >
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@
                     <a class="nav-link" href="./bury.html">Bury</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Dig</a>
+                    <a class="nav-link" href="./dig.html">Dig</a>
                 </li>
             </ul>
         </div>
@@ -76,16 +76,7 @@
 
 <script>
 
-    // fetch data
-    fetch('http://127.0.0.1:8000/?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
-        .then(response => response.json())
-        .then(data => {
-            // Save the data as a global variable
-            console.log(data)
-            window.locationdata = data;
-            console.log('Location data:', window.locationdata);
-        })
-        .catch(error => console.error('Error fetching data:', error));
+
 
 
     // TO MAKE THE MAP APPEAR YOU MUST
@@ -104,16 +95,25 @@
 
 
     map.on('load', function () {
-        window.locationdata.forEach(function (location) {
-            var el = document.createElement('div');
-            el.className = 'marker ' + location.location.type;
-            new mapboxgl.Marker(el)
-                .setLngLat(location.location.coordinates)
-                .setPopup(new mapboxgl.Popup().setHTML(location.username))
-                .addTo(map);
-        });
-    });
+        // fetch data
+        fetch('http://127.0.0.1:8000/?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
+            .then(response => response.json())
+            .then(data => {
+                // Save the data as a global variable
+                if(data){
+                    data.forEach(function (location) {
+                    var el = document.createElement('div');
+                    el.className = 'marker ' + location.location.type;
+                    new mapboxgl.Marker(el)
+                        .setLngLat(location.location.coordinates)
+                        .setPopup(new mapboxgl.Popup().setHTML(location.username))
+                        .addTo(map);
+                });
+                }
 
+
+            });
+    });
 
     map.addControl(new mapboxgl.GeolocateControl({
         positionOptions: {

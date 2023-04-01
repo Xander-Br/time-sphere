@@ -57,13 +57,13 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="./home.html">Home</a>
+                    <a class="nav-link "  href="./home.html">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Bury</a>
+                    <a class="nav-link active" aria-current="page" href="#">Bury</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Dig</a>
+                    <a class="nav-link" href="./dig.html">Dig</a>
                 </li>
             </ul>
         </div>
@@ -92,8 +92,7 @@
     //get the values of the form
     function sendForm(event) {
         event.preventDefault();
-
-        let username = localStorage.getItem('loginData').username;
+        let username = localStorage.getItem('username');
         let date_unlock_at = document.getElementById('date_unlock_at').value;
         let data_text = document.getElementById('text').value;
         let img = document.getElementById('image').files[0];

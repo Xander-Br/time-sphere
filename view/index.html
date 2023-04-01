@@ -75,7 +75,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data)
-                    storeInLocalStorage(data.user);
+                    storeInLocalStorage(data.user.username);
                     document.location.href = "./home.html"
                 } else {
                     alert("Error: " + response.statusText);
@@ -87,7 +87,7 @@
     });
 
     function storeInLocalStorage(data) {
-        localStorage.setItem("loginData", JSON.stringify(data));
+        localStorage.setItem("username", data);
     }
 </script>
 </html>

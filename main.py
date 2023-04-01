@@ -125,11 +125,13 @@ async def get_documents_near_location(longitude: float = Query(..., description=
     }
 
     documents = []
-    for doc in capsuleCollection.find(query):
-        doc["_id"] = str(doc["_id"])
-        documents.append(doc)
+    if documents:
+        for doc in capsuleCollection.find(query):
+            doc["_id"] = str(doc["_id"])
+            documents.append(doc)
 
-    return documents
+        return documents
+    return None
 
 
 @app.post("/login")
