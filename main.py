@@ -78,7 +78,6 @@ async def save_image(file: UploadFile):
 @app.post("/create")
 async def create_document(
         username: str = Form(...),
-        location: str = Form(...),
         text: str = Form(...),
         longitude: float = Form(...),
         latitude: float = Form(...),
