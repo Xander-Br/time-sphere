@@ -1,0 +1,15 @@
+{
+  "name": "TimeSphere",
+  "short_name": "TimeS",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/assets/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "display": "fullscreen",
+  "orientation": "portrait"
+}

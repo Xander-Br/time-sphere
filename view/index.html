@@ -12,6 +12,9 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
 
+    <link rel="manifest" href="./manifest.json">
+
+
 </head>
 <style>
     .text-center {
@@ -51,6 +54,10 @@
 </main>
 </body>
 <script>
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('service-worker.js')
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector("form");
         form.addEventListener("submit", async (e) => {
