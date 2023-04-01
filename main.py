@@ -10,7 +10,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 
 app = FastAPI()
-client = MongoClient('mongodb+srv://doadmin:9c43u0Vd876E2SRH@db-mongodb-fra1-00555-517d35a7.mongo.ondigitalocean.com/admin?tls=true&authSource=admin')
+client = MongoClient(
+    'mongodb+srv://doadmin:9c43u0Vd876E2SRH@db-mongodb-fra1-00555-517d35a7.mongo.ondigitalocean.com/admin?tls=true&authSource=admin')
 db = client["db"]
 collection = db["capsule"]
 collection.create_index([("location", "2dsphere")])
@@ -18,13 +19,15 @@ collection.create_index([("location", "2dsphere")])
 STATIC_DIR = "static"
 os.makedirs(STATIC_DIR, exist_ok=True)
 
+
 class UserData(BaseModel):
     username: str
     location: dict = Field(..., example={"type": "Point", "coordinates": [0.0, 0.0]})
     created_at: Optional[datetime] = datetime.now()
-    unlocked_at: Optional[datetime] = None
+    unlock_at: Optional[datetime] = None
     data_img_src: Optional[str] = None
     data_text: str
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +35,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 async def save_image(file: UploadFile):
     timestamp = int(time.time())
@@ -44,12 +48,14 @@ async def save_image(file: UploadFile):
         f.write(await file.read())
     return file_location, filename
 
+
 @app.post("/create")
 async def create_document(
-    username: str = Form(...),
-    location: str = Form(...),
-    data_text: str = Form(...),
-    img: UploadFile = File(...),
+        username: str = Form(...),
+        location: str = Form(...),
+        text: str = Form(...),
+        unlock_at: datetime = Form(...),
+        img: UploadFile = File(...),
 ):
     import json
 
@@ -62,9 +68,9 @@ async def create_document(
         "username": username,
         "location": location_dict,
         "created_at": datetime.now(),
-        "unlocked_at": None,
-        "data_img_src": img_url,
-        "data_text": data_text,
+        "unlock_at": unlock_at,
+        "img_src": img_url,
+        "text": text,
     }
 
     result = collection.insert_one(user_data)
@@ -73,6 +79,7 @@ async def create_document(
     else:
         raise HTTPException(status_code=400, detail="Unable to create document")
 
+
 @app.get("/static/{filename}")
 async def get_image(filename: str):
     file_location = os.path.join(STATIC_DIR, filename)
@@ -80,6 +87,7 @@ async def get_image(filename: str):
         return FileResponse(file_location)
     else:
         raise HTTPException(status_code=404, detail="Image not found")
+
 
 @app.get("/")
 async def get_documents_near_location(longitude: float = Query(..., description="Longitude of the center point"),
