@@ -1,1 +1,1 @@
-const api = "http://localhost:8000"
+const api = "http://165.22.72.92:8000"

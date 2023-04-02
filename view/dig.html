@@ -15,7 +15,7 @@
     <script>
         THREEx.ArToolkitContext.baseURL = 'https://raw.githack.com/jeromeetienne/ar.js/master/three.js/'
     </script>
-        <script src="api.js"></script>
+    <script src="api.js"></script>
 
 </head>
 <body>
@@ -104,10 +104,15 @@
 
                         let text = document.createElement('a-text')
                         text.setAttribute('value', place.text)
-                        text.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude};`)
+                        //text.setAttribute('gps-entity-place', `latitude: ${latitude}; longitude: ${longitude};`)
+                        console.log(img.getAttribute('position'))
+
+                        let x, y, z = img.getAttribute('position')
+                        text.setAttribute('position', {x: x, y:y, z:z})
                         text.setAttribute('color', `red`)
                         text.setAttribute('width', `50`)
                         text.setAttribute('rotation', '0 90 0')
+                        console.log(text)
                         scene.appendChild(text)
                         text.addEventListener('loaded', () => {
                             window.dispatchEvent(new CustomEvent('gps-entity-place-loaded'))
@@ -119,7 +124,9 @@
                     }
                 )
                 ;
-            }});}
+            }
+        });
+    }
 </script>
 </body>
 </html>
