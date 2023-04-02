@@ -15,6 +15,8 @@
     <script>
         THREEx.ArToolkitContext.baseURL = 'https://raw.githack.com/jeromeetienne/ar.js/master/three.js/'
     </script>
+        <script src="api.js"></script>
+
 </head>
 <body>
 <div style='margin: 0; overflow: hidden;'>
@@ -54,7 +56,7 @@
     window.onload = async () => {
 
 
-        fetch('http://127.0.0.1:8000/?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
+        fetch(api + '/get?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
             .then(response => response.json())
             .then(async data => {
                 stData = {

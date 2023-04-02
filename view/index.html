@@ -13,6 +13,7 @@
             crossorigin="anonymous"></script>
 
     <link rel="manifest" href="./manifest.json">
+        <script src="api.js"></script>
 
 
 </head>
@@ -54,6 +55,8 @@
 </main>
 </body>
 <script>
+
+
     if('serviceWorker' in navigator){
         navigator.serviceWorker.register('service-worker.js')
     }
@@ -67,7 +70,7 @@
             formData.append("username", username);
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/login", {
+                const response = await fetch(api + "/login", {
                     method: "POST",
                     body: formData
                 });

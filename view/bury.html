@@ -19,6 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
+        <script src="api.js"></script>
 
 </head>
 <body>
@@ -111,7 +112,7 @@
 
                 // Send the data to the server
                 let xhr = new XMLHttpRequest();
-                xhr.open('POST', 'http://127.0.0.1:8000/create');
+                xhr.open('POST', api + '/create');
 
                 xhr.onload = function () {
                     if (xhr.status === 200) {

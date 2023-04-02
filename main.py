@@ -2,8 +2,6 @@ import os
 import time
 from datetime import datetime
 
-import bcrypt
-
 from fastapi import FastAPI, Query, File, UploadFile, Form, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
@@ -12,6 +10,7 @@ from pymongo import MongoClient
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 client = MongoClient(
@@ -29,6 +28,7 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 class User(BaseModel):
     username: str
 
+
 class Capsule(BaseModel):
     username: str
     location: dict = Field(..., example={"type": "Point", "coordinates": [0.0, 0.0]})
@@ -37,6 +37,7 @@ class Capsule(BaseModel):
     data_img_src: Optional[str] = None
     data_text: str
     friends: Optional[list]
+
 
 def authenticate_user(username: str):
     user = userCollection.find_one({"username": username})
@@ -52,9 +53,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-
 
 
 async def save_image(file: UploadFile):
@@ -108,7 +106,7 @@ async def get_image(filename: str):
         raise HTTPException(status_code=404, detail="Image not found")
 
 
-@app.get("/")
+@app.get("/get")
 async def get_documents_near_location(longitude: float = Query(..., description="Longitude of the center point"),
                                       latitude: float = Query(..., description="Latitude of the center point"),
                                       radius: float = Query(..., description="Radius in meters")):
@@ -125,13 +123,12 @@ async def get_documents_near_location(longitude: float = Query(..., description=
     }
 
     documents = []
-    if documents:
-        for doc in capsuleCollection.find(query):
-            doc["_id"] = str(doc["_id"])
-            documents.append(doc)
 
-        return documents
-    return None
+    for doc in capsuleCollection.find(query):
+        doc["_id"] = str(doc["_id"])
+        documents.append(doc)
+
+    return documents
 
 
 @app.post("/login")

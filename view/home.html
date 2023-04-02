@@ -13,6 +13,7 @@
             crossorigin="anonymous"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css' rel='stylesheet'/>
+    <script src="api.js"></script>
 </head>
 <body>
 <style>
@@ -42,17 +43,21 @@
         background-image: url('https://cdn.mapmarker.io/api/v1/pin?text=%20&size=50&hoffset=1&background=0074e4');
     }
 
-    .Point {
+    .open {
         background-image: url('./assets/capsule.png');
         width: 40px;
         height: 40px;
+    }
+
+    .close {
+        background-image: url("./assets/capsule-close.png");
     }
 </style>
 
 <div id='map' style='width: 100vw; height: 100vh;'></div>
 
 
-<nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" >
+<nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,8 +82,6 @@
 <script>
 
 
-
-
     // TO MAKE THE MAP APPEAR YOU MUST
 
     mapboxgl.accessToken = 'pk.eyJ1IjoieGFuZGVyaDEiLCJhIjoiY2xmeGZneHZiMGd2MzNmcXlxeHBmZW1qZyJ9.x9-cNL1fb1duFQTBI0jgkQ';
@@ -96,24 +99,57 @@
 
     map.on('load', function () {
         // fetch data
-        fetch('http://127.0.0.1:8000/?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
+        fetch(api + '/get?longitude=50.629862255534526&latitude=4.86329867051981&radius=500000000')
             .then(response => response.json())
             .then(data => {
                 // Save the data as a global variable
-                if(data){
-                    data.forEach(function (location) {
-                    var el = document.createElement('div');
-                    el.className = 'marker ' + location.location.type;
-                    new mapboxgl.Marker(el)
-                        .setLngLat(location.location.coordinates)
-                        .setPopup(new mapboxgl.Popup().setHTML(location.username))
-                        .addTo(map);
-                });
+                if (data) {
+                    data.forEach((location, index) => {
+                        var el = document.createElement('div');
+                        if (new Date(location.unlock_at) >= new Date()) {
+                            el.className = 'marker close';
+                        } else {
+                            el.className = 'marker open';
+                        }
+
+
+                        new mapboxgl.Marker(el)
+                            .setLngLat(location.location.coordinates)
+                            .setPopup(new mapboxgl.Popup().setHTML(`<div id="popup-${index}">${location.username}</div>`))
+                            .addTo(map);
+
+                        el.addEventListener('click', () => {
+                            startCountdown(index, location.unlock_at);
+                        });
+                    });
+
+
                 }
 
 
             });
     });
+
+    function startCountdown(index, unlock_at) {
+
+        const targetDate = new Date(Date.parse(unlock_at));
+        const popupElement = document.getElementById(`popup-${index}`);
+        const countdown = setInterval(() => {
+            const now = new Date().getTime();
+            const remainingTime = targetDate - now;
+
+            if (remainingTime <= 0) {
+                clearInterval(countdown);
+                popupElement.innerHTML = '0s remaining';
+            } else {
+                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+                const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+                popupElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s remaining`;
+            }
+        }, 1000);
+    }
 
     map.addControl(new mapboxgl.GeolocateControl({
         positionOptions: {
